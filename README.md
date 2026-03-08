@@ -21,6 +21,7 @@ Please see the CHANGELOG.md for details of recent updates.
 ## Table of Contents
 
 - [Overview](#overview)
+- [Origin and Trademarks](#origin-and-trademarks)
 - [Development](#development)
 
 ## Overview
@@ -49,6 +50,10 @@ The docs for the latest release are available [here](https://github.com/confluen
 ### Installation
 
 The recommended way to install kcp is by downloading the latest release binary. Instructions for installing the latest release are available in the [latest documentation](https://github.com/confluentinc/kcp/releases/latest).
+
+### Origin and Trademarks
+
+This project is a fork of [Confluent's KCP](https://github.com/confluentinc/kcp). We use the names "Confluent" and "KCP" only to describe the **origin** of the code and to describe **migration scenarios** (e.g. migrating from Confluent Cloud). We do not suggest that Confluent endorses or is the source of this project. Confluent's trademarks remain the property of Confluent, Inc.
 
 ## Development
 
