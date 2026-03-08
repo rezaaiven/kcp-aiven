@@ -105,6 +105,11 @@ This section re-reviews Phase 1 against the codebase and the critical review (Se
 5. **Tests**
    - Unit tests for Confluent client and discover using **mocked** Confluent API responses (and optionally a small test that validates state file shape).
 
+6. **Live API tests (optional)**
+   - Tests that run against the **real** Confluent Cloud API when credentials are available. Built only with `-tags=confluent_live` so they do not run in normal CI. Use for integration/contract verification.
+   - **Run:** Set `CONFLUENT_API_KEY` and `CONFLUENT_API_SECRET` (or `confluent-credentials.yaml`), then: `go test -tags=confluent_live ./cmd/discover/... ./internal/client/...`
+   - **Files:** `cmd/discover/confluent_discoverer_live_test.go`, `internal/client/confluent_cloud_live_test.go`
+
 ### Out of scope for Phase 1 (explicit)
 
 - **Report costs/metrics** for Confluent state: not in Phase 1; later a separate “report topology” (or `report confluent-topology`) can read Confluent state and output topology only (no AWS cost/metrics).
@@ -118,6 +123,7 @@ This section re-reviews Phase 1 against the codebase and the critical review (Se
 3. Confluent state type and file format (discriminator or separate file).
 4. Discover command (confluent) that writes Confluent state only.
 5. Tests: mocked Confluent API for client and discover.
+6. Live API tests: optional tests against real Confluent Cloud API (`go test -tags=confluent_live ...`).
 
 This keeps the existing MSK → Confluent flow untouched and makes the Confluent → Aiven path a separate, first-class pipeline from discovery onward.
 
