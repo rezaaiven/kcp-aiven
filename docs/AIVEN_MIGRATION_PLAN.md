@@ -201,7 +201,7 @@ internal/client/
   confluent_cloud.go          # NEW: Confluent Cloud API client
 
 internal/services/
-  confluent_discover/         # NEW: discover logic for Confluent (optional package)
+  confluent_discover/         # Optional: Phase 1 instead put discover logic in cmd/discover/confluent_discoverer.go
     discoverer.go
   hcl/
     aiven/                    # NEW: Aiven Terraform resources
@@ -215,7 +215,9 @@ internal/types/
 
 cmd/
   discover/
-    cmd_discover.go           # EXTEND: --source confluent | aws
+    cmd_discover.go           # existing MSK discover
+    cmd_discover_confluent.go # Phase 1: kcp discover-confluent
+    confluent_discoverer.go   # Phase 1: Confluent discover logic
   create_asset/
     target_infra/
       cmd_create_asset_target_infra.go  # EXTEND: --target aiven

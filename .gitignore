@@ -53,6 +53,7 @@ set_migration_env_vars.sh
 kcp-scan*
 cluster-credentials.yaml
 confluent-credentials.yaml
+kcp-state-confluent.json
 
 # Added by goreleaser init:
 dist/
