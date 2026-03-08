@@ -14,6 +14,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/kafka v1.46.5
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.94.0
 	github.com/charmbracelet/glamour v0.10.0
+	github.com/confluentinc/ccloud-sdk-go-v2/cmk v0.0.0-20250910162251-78e6ba92f1ac
+	github.com/confluentinc/ccloud-sdk-go-v2/org v0.0.0-20250910162251-78e6ba92f1ac
 	github.com/confluentinc/confluent-kafka-go/v2 v2.12.0
 	github.com/creativeprojects/go-selfupdate v1.5.2
 	github.com/fatih/color v1.18.0

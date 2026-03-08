@@ -96,6 +96,10 @@ github.com/clipperhouse/stringish v0.1.1 h1:+NSqMOr3GR6k1FdRhhnXrLfztGzuG+VuFDfa
 github.com/clipperhouse/stringish v0.1.1/go.mod h1:v/WhFtE1q0ovMta2+m+UbpZ+2/HEXNWYXQgCt4hdOzA=
 github.com/clipperhouse/uax29/v2 v2.3.0 h1:SNdx9DVUqMoBuBoW3iLOj4FQv3dN5mDtuqwuhIGpJy4=
 github.com/clipperhouse/uax29/v2 v2.3.0/go.mod h1:Wn1g7MK6OoeDT0vL+Q0SQLDz/KpfsVRgg6W7ihQeh4g=
+github.com/confluentinc/ccloud-sdk-go-v2/cmk v0.0.0-20250910162251-78e6ba92f1ac h1:/4k0jpaoY/kCjvNKolbMTQ2oRBSMrEZjvTuu50uCkVg=
+github.com/confluentinc/ccloud-sdk-go-v2/cmk v0.0.0-20250910162251-78e6ba92f1ac/go.mod h1:tC4DJy85Gfj/JDJK3bn8zA5Eqczr5mKHmh7Id9YA0o0=
+github.com/confluentinc/ccloud-sdk-go-v2/org v0.0.0-20250910162251-78e6ba92f1ac h1:At4nWE+fJmbf0d/u18PVaIeLUFV5SK1f71oPVNx1VP4=
+github.com/confluentinc/ccloud-sdk-go-v2/org v0.0.0-20250910162251-78e6ba92f1ac/go.mod h1:lEK+mPBuJEqA9IwgLWana71jciofFuEhw+/c57rh+S0=
 github.com/confluentinc/confluent-kafka-go/v2 v2.12.0 h1:If5Bi+oJVehEdjuhHa7QEFppQtyexvBXJiuZIloJtIw=
 github.com/confluentinc/confluent-kafka-go/v2 v2.12.0/go.mod h1:6ypM/bldGVG8gf1s9/05ICQU76BmXcbhF6K2jtznock=
 github.com/cpuguy83/go-md2man/v2 v2.0.6/go.mod h1:oOW0eioCTA6cOiMLiUPZOpcVxMig6NIQQ7OS05n1F4g=

@@ -97,6 +97,7 @@ This section re-reviews Phase 1 against the codebase and the critical review (Se
 3. **Confluent credentials**
    - Design: where Confluent API key/secret are stored and how they are looked up (file path, env vars, or key in existing credentials file).
    - Implement the lookup so the Confluent client and discover command can run without hardcoded credentials.
+   - **Implemented:** `confluent-credentials.yaml` (or env: `CONFLUENT_API_KEY`, `CONFLUENT_API_SECRET`, `CONFLUENT_ENVIRONMENT_ID`); see `internal/types/confluent_credentials.go` and `docs/confluent-credentials.example.yaml`.
 
 4. **Discover for Confluent**
    - New command or `discover --source confluent` that: uses Confluent client and credentials, runs “Confluent discoverer” (no AWS regions), writes **only** Confluent state (no change to existing `State` or MSK discover path).

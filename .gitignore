@@ -51,6 +51,7 @@ kcp
 set_migration_env_vars.sh
 kcp-scan*
 cluster-credentials.yaml
+confluent-credentials.yaml
 
 # Added by goreleaser init:
 dist/
