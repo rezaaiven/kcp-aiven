@@ -6,6 +6,7 @@ import (
 	"github.com/confluentinc/kcp/cmd/create_asset/migrate_connectors"
 	"github.com/confluentinc/kcp/cmd/create_asset/migrate_schemas"
 	"github.com/confluentinc/kcp/cmd/create_asset/migrate_topics"
+	"github.com/confluentinc/kcp/cmd/create_asset/migrate_topics_aiven"
 	"github.com/confluentinc/kcp/cmd/create_asset/migration_infra"
 	"github.com/confluentinc/kcp/cmd/create_asset/reverse_proxy"
 	"github.com/confluentinc/kcp/cmd/create_asset/target_infra"
@@ -25,6 +26,7 @@ func NewCreateAssetCmd() *cobra.Command {
 		migrate_acls.NewMigrateAclsCmd(),
 		migrate_connectors.NewMigrateConnectorsCmd(),
 		migrate_topics.NewMigrateTopicsCmd(),
+		migrate_topics_aiven.NewMigrateTopicsAivenCmd(),
 		migrate_schemas.NewMigrateSchemasCmd(),
 		migration_infra.NewMigrationInfraCmd(),
 		reverse_proxy.NewReverseProxyCmd(),

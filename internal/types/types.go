@@ -151,6 +151,27 @@ type AivenTargetRequest struct {
 	PreventDestroy bool  `json:"prevent_destroy"` // Whether to set lifecycle { prevent_destroy = true }
 }
 
+// AivenMigrateTopicsRequest holds parameters for generating Confluent → Aiven replication (Phase 2.2).
+// Used by create-asset migrate-topics-aiven. Reads Confluent state for bootstrap; Confluent
+// API key/secret are passed as Terraform variables at apply time (not stored in state).
+type AivenMigrateTopicsRequest struct {
+	// Aiven (target) - same project as the Kafka from 2.1
+	ProjectName          string `json:"project_name"`           // Aiven project name
+	AivenKafkaServiceName string `json:"aiven_kafka_service_name"` // Name of the Aiven Kafka service (from 2.1)
+	// MirrorMaker 2 service - new managed service
+	MirrorMakerServiceName string `json:"mirrormaker_service_name"` // Unique name for the MM2 service
+	MirrorMakerCloudName   string `json:"mirrormaker_cloud_name"`   // Same as Kafka or explicit (e.g. aws-eu-west-1)
+	MirrorMakerPlan        string `json:"mirrormaker_plan"`         // e.g. business-4
+	// Confluent (source) - from discover-confluent state
+	ConfluentBootstrapServers string `json:"confluent_bootstrap_servers"` // Comma-separated bootstrap (e.g. from ConfluentClusterInfo.KafkaBootstrapEndpoint)
+	// Confluent SASL: use var names so secrets are not in tfvars
+	ConfluentAPIKeyVar    string `json:"-"` // Terraform variable name for Confluent API key (e.g. confluent_source_api_key)
+	ConfluentAPISecretVar string `json:"-"` // Terraform variable name for Confluent API secret
+	// Replication
+	TopicPattern string `json:"topic_pattern"` // Regex for topics to mirror (e.g. ".*" for all)
+	PreventDestroy bool  `json:"prevent_destroy"`
+}
+
 type TerraformFiles struct {
 	MainTf           string `json:"main.tf"`
 	ProvidersTf      string `json:"providers.tf"`

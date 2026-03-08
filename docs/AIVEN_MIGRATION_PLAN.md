@@ -175,6 +175,8 @@ This keeps the existing MSK → Confluent flow untouched and makes the Confluent
 
 So: **MirrorMaker 2 is the replication path**; **external Kafka integration is how we tell MirrorMaker 2 where Confluent Cloud is.** KCP’s create-asset should output both (integration + MM2 service + flows). Do not treat “external integration only” as a migration path—it only defines the connection; replication is done by MirrorMaker 2.
 
+- **Implemented (Phase 2.2):** `kcp create-asset migrate-topics-aiven` with `--state-file` (Confluent state), `--cluster-id`, `--aiven-project`, `--aiven-kafka-service-name`, `--mirrormaker-service-name`, `--mirrormaker-cloud-name`, `--mirrormaker-plan`, `--topic-pattern`, `--output-dir`, `--prevent-destroy`. Generates Terraform: `aiven_service_integration_endpoint` (external Kafka, SASL_SSL + Confluent API key/secret via variables), `aiven_kafka_mirrormaker`, two `aiven_service_integration` (endpoint→MM2, Aiven Kafka→MM2), `aiven_mirrormaker_replication_flow`. Confluent API key/secret are not written to tfvars; set at `terraform apply`. README documents **ACL and SASL_SSL requirements** (source READ, target WRITE, Confluent SASL_SSL; see [Aiven: Permissions and internal topics in MirrorMaker 2](https://aiven.io/docs/products/kafka/kafka-mirrormaker/concepts/permissions-internal-topics)).
+
 ### 2.3 Migrate topics, schemas, ACLs
 
 - **Topics:** Drive mirror/replication setup (above) so topics on Confluent are mirrored to Aiven. Optionally generate `aiven_kafka_topic` for explicit create (e.g. if not using mirror for some topics).
