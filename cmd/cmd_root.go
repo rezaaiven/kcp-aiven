@@ -72,6 +72,7 @@ func init() {
 		report.NewReportCmd(),
 		ui.NewUICmd(),
 		discover.NewDiscoverCmd(),
+		discover.NewDiscoverConfluentCmd(),
 		version.NewVersionCmd(),
 		update.NewUpdateCmd(),
 	)
