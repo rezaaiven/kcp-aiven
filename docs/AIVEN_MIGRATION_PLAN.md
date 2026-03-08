@@ -69,6 +69,59 @@ Implement:
 
 ---
 
+## Phase 1 re-review (pre-implementation)
+
+This section re-reviews Phase 1 against the codebase and the critical review (Section “Critical review: weaknesses, risks, and alternatives”) so implementation can proceed with clear decisions.
+
+### Decisions to lock in before implementation
+
+| Topic | Original Phase 1 | Re-review recommendation | Rationale |
+|-------|------------------|--------------------------|-----------|
+| **State model** | Option B: extend `State` with `SourceType` + `ConfluentClusters` | **Use a separate Confluent state shape** (Section 3.1), not Option B | Every consumer of `State` assumes AWS/MSK: `state.Regions`, `GetClusterByArn(clusterArn)`, `WriteReportCommands`, report costs/metrics (`len(state.Regions) == 0` → error). Extending `State` would require branches or fallbacks in report, UI API, frontend, and create-asset. Empty `Regions` for Confluent breaks existing report commands. |
+| **Discover command** | Option A or B: new command vs `discover --source confluent` | **Either** `kcp discover-confluent` **or** `kcp discover --source confluent` that **delegates to a separate implementation** writing **only** Confluent state | No change to existing `State` or `NewStateFrom` for MSK. Same binary can support both; implementation writes Confluent-specific state file (e.g. same filename with discriminator or dedicated `kcp-state-confluent.json`). |
+| **Credentials** | Not specified | **Define in Phase 1:** where Confluent API key/secret are stored and how discover (and later scan/create-asset) look them up | Current credentials are `cluster-credentials.yaml` with `Regions` and MSK-specific auth. Confluent uses API key + secret (org/cluster scope). Options: new file (e.g. `confluent-credentials.yaml`), new top-level key in existing file, or env vars. Must be decided so the Confluent client and discover command can be implemented. |
+| **Confluent client** | List envs, clusters, bootstrap, REST; optional topics/ACLs | **Add:** retries + backoff for rate limits (429); **document** which API key type (org vs cluster) is required for Cloud API vs Kafka REST | Critical review 1.4: Confluent APIs may throttle; auth scope (cluster vs org) must be clear for listing environments/clusters and for Kafka REST. |
+| **Testing** | Not in Phase 1 | **Include in Phase 1:** tests for Confluent discovery using **mocked Confluent API responses** (no live Confluent account required in CI) | Critical review 1.6: avoids regressions and API compatibility issues; live-API/contract tests can be added later. |
+
+### Phase 1 scope (revised)
+
+1. **Confluent Cloud API client** (`internal/client/confluent_cloud.go`)
+   - List environments (or single environment from config), list Kafka clusters, bootstrap + REST endpoint per cluster.
+   - Optional: topics via Kafka REST v3 / AdminClient; ACLs if API exists.
+   - **Must have:** retries and backoff for rate limits; documented auth scope (API key type and usage).
+
+2. **Confluent state model (separate shape)**
+   - New type, e.g. `ConfluentMigrationState` (or state file with discriminator `"source_type": "confluent_cloud"` and structure like `environments` / `confluent_clusters`), **no** `Regions` or Option B extension of current `State`.
+   - Persist to same file name with discriminator or to `kcp-state-confluent.json`; loader can return either MSK `State` or Confluent state for downstream commands.
+
+3. **Confluent credentials**
+   - Design: where Confluent API key/secret are stored and how they are looked up (file path, env vars, or key in existing credentials file).
+   - Implement the lookup so the Confluent client and discover command can run without hardcoded credentials.
+
+4. **Discover for Confluent**
+   - New command or `discover --source confluent` that: uses Confluent client and credentials, runs “Confluent discoverer” (no AWS regions), writes **only** Confluent state (no change to existing `State` or MSK discover path).
+
+5. **Tests**
+   - Unit tests for Confluent client and discover using **mocked** Confluent API responses (and optionally a small test that validates state file shape).
+
+### Out of scope for Phase 1 (explicit)
+
+- **Report costs/metrics** for Confluent state: not in Phase 1; later a separate “report topology” (or `report confluent-topology`) can read Confluent state and output topology only (no AWS cost/metrics).
+- **Scan** of Confluent clusters (topics, ACLs): remains optional / Phase 2.
+- **UI, create-asset, Aiven:** all later phases.
+
+### Implementation order for Phase 1
+
+1. Confluent credentials: **design and implement** storage + lookup.
+2. Confluent Cloud API client with retries, backoff, and documented auth scope.
+3. Confluent state type and file format (discriminator or separate file).
+4. Discover command (confluent) that writes Confluent state only.
+5. Tests: mocked Confluent API for client and discover.
+
+This keeps the existing MSK → Confluent flow untouched and makes the Confluent → Aiven path a separate, first-class pipeline from discovery onward.
+
+---
+
 ## Phase 2: Aiven as target (create-asset)
 
 **Goal:** Generate Terraform and migration assets that create Aiven for Kafka and link/mirror **from** Confluent Cloud **to** Aiven.
