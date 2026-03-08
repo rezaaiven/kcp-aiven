@@ -3,6 +3,7 @@ package aiven
 import (
 	"github.com/confluentinc/kcp/internal/utils"
 	"github.com/hashicorp/hcl/v2/hclwrite"
+	"github.com/zclconf/go-cty/cty"
 )
 
 const (
@@ -33,5 +34,16 @@ func GenerateKafkaResource(tfResourceName, projectVarName, cloudNameVarName, pla
 		_ = utils.GenerateLifecycleBlock(block, "prevent_destroy", true)
 	}
 
+	return block
+}
+
+// GenerateKafkaTopic creates an aiven_kafka_topic resource (optional explicit topic creation on Aiven).
+// projectVarName and serviceNameVarName are Terraform variable names; topicName is the Kafka topic name.
+func GenerateKafkaTopic(tfResourceName, projectVarName, serviceNameVarName, topicName string) *hclwrite.Block {
+	block := hclwrite.NewBlock("resource", []string{"aiven_kafka_topic", tfResourceName})
+	body := block.Body()
+	body.SetAttributeRaw("project", utils.TokensForVarReference(projectVarName))
+	body.SetAttributeRaw("service_name", utils.TokensForVarReference(serviceNameVarName))
+	body.SetAttributeValue("topic_name", cty.StringVal(topicName))
 	return block
 }

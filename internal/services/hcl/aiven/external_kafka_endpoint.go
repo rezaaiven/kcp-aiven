@@ -17,6 +17,7 @@ const (
 	VarMirrormakerCloudName       = "mirrormaker_cloud_name"
 	VarMirrormakerPlan            = "mirrormaker_plan"
 	VarAivenKafkaServiceName      = "aiven_kafka_service_name"
+	VarCreateTopicNames           = "create_topic_names" // list(string) of topic names to create via aiven_kafka_topic
 )
 
 // Default cluster aliases for replication flow.

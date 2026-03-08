@@ -24,8 +24,9 @@ var (
 	mmMirrormakerCloudName    string
 	mmMirrormakerPlan         string
 	mmTopicPattern            string
-	mmOutputDir                string
-	mmPreventDestroyStr        string
+	mmCreateTopics            string // comma-separated topic names to create via aiven_kafka_topic
+	mmOutputDir               string
+	mmPreventDestroyStr       string
 )
 
 func NewMigrateTopicsAivenCmd() *cobra.Command {
@@ -48,6 +49,7 @@ func NewMigrateTopicsAivenCmd() *cobra.Command {
 	flags.StringVar(&mmMirrormakerCloudName, "mirrormaker-cloud-name", "", "Cloud/region for MirrorMaker 2 (e.g. aws-eu-west-1). Defaults to same as Aiven Kafka if not set; pass explicitly if Kafka was created elsewhere.")
 	flags.StringVar(&mmMirrormakerPlan, "mirrormaker-plan", "business-4", "MirrorMaker 2 plan")
 	flags.StringVar(&mmTopicPattern, "topic-pattern", ".*", "Topic pattern to replicate (regex; default: .* for all topics)")
+	flags.StringVar(&mmCreateTopics, "create-topics", "", "Optional comma-separated list of topic names to create on Aiven via aiven_kafka_topic")
 	flags.StringVar(&mmOutputDir, "output-dir", "migrate_topics_aiven", "Output directory for generated Terraform files")
 	flags.StringVar(&mmPreventDestroyStr, "prevent-destroy", "true", "Set lifecycle { prevent_destroy = true } (true or false)")
 	cmd.Flags().AddFlagSet(flags)
@@ -122,15 +124,26 @@ func runMigrateTopicsAiven(cmd *cobra.Command, args []string) error {
 
 	preventDestroy, _ := strconv.ParseBool(mmPreventDestroyStr)
 
+	var createTopicNames []string
+	if mmCreateTopics != "" {
+		for _, t := range strings.Split(mmCreateTopics, ",") {
+			t = strings.TrimSpace(t)
+			if t != "" {
+				createTopicNames = append(createTopicNames, t)
+			}
+		}
+	}
+
 	request := types.AivenMigrateTopicsRequest{
-		ProjectName:              strings.TrimSpace(mmAivenProject),
-		AivenKafkaServiceName:    mmAivenKafkaServiceName,
-		MirrorMakerServiceName:   mmMirrormakerServiceName,
-		MirrorMakerCloudName:     cloudName,
-		MirrorMakerPlan:          strings.TrimSpace(mmMirrormakerPlan),
+		ProjectName:               strings.TrimSpace(mmAivenProject),
+		AivenKafkaServiceName:     mmAivenKafkaServiceName,
+		MirrorMakerServiceName:    mmMirrormakerServiceName,
+		MirrorMakerCloudName:      cloudName,
+		MirrorMakerPlan:           strings.TrimSpace(mmMirrormakerPlan),
 		ConfluentBootstrapServers: bootstrapServers,
-		TopicPattern:             strings.TrimSpace(mmTopicPattern),
-		PreventDestroy:           preventDestroy,
+		TopicPattern:              strings.TrimSpace(mmTopicPattern),
+		PreventDestroy:            preventDestroy,
+		CreateTopicNames:          createTopicNames,
 	}
 
 	slog.Info("📋 generating Terraform configuration")

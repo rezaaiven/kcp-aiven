@@ -170,6 +170,16 @@ type AivenMigrateTopicsRequest struct {
 	// Replication
 	TopicPattern string `json:"topic_pattern"` // Regex for topics to mirror (e.g. ".*" for all)
 	PreventDestroy bool  `json:"prevent_destroy"`
+	// Optional: topic names to create on Aiven via aiven_kafka_topic (Phase 2.3)
+	CreateTopicNames []string `json:"create_topic_names,omitempty"`
+}
+
+// AivenMigrateAclsRequest holds parameters for generating Aiven Kafka ACL Terraform (Phase 2.3).
+// Used by create-asset migrate-acls-aiven. ACLs are read from an input file (e.g. exported from Confluent).
+type AivenMigrateAclsRequest struct {
+	ProjectName          string              `json:"project_name"`
+	AivenKafkaServiceName string             `json:"aiven_kafka_service_name"`
+	AclsByPrincipal      map[string][]Acls   `json:"-"` // principal -> list of ACLs (only TOPIC ACLs are emitted)
 }
 
 type TerraformFiles struct {

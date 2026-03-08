@@ -63,3 +63,29 @@ func TestAivenMigrateTopicsHCLService_GenerateTerraformFiles(t *testing.T) {
 		t.Error("MainTf replication flow should include depends_on for service integrations")
 	}
 }
+
+func TestAivenMigrateTopicsHCLService_GenerateTerraformFiles_WithCreateTopicNames(t *testing.T) {
+	svc := NewAivenMigrateTopicsHCLService()
+	request := types.AivenMigrateTopicsRequest{
+		ProjectName:               "my-project",
+		AivenKafkaServiceName:     "my-kafka",
+		MirrorMakerServiceName:    "my-mm2",
+		MirrorMakerCloudName:      "aws-eu-west-1",
+		MirrorMakerPlan:           "business-4",
+		ConfluentBootstrapServers: "pkc-xxx:9092",
+		TopicPattern:              ".*",
+		CreateTopicNames:          []string{"my-topic", "other-topic"},
+	}
+
+	project := svc.GenerateTerraformFiles(request)
+
+	if !strings.Contains(project.MainTf, "aiven_kafka_topic") {
+		t.Error("MainTf should contain aiven_kafka_topic when CreateTopicNames is set")
+	}
+	if !strings.Contains(project.MainTf, "my-topic") || !strings.Contains(project.MainTf, "other-topic") {
+		t.Error("MainTf should contain topic names from CreateTopicNames")
+	}
+	if !strings.Contains(project.InputsAutoTfvars, "create_topic_names") {
+		t.Error("InputsAutoTfvars should set create_topic_names when CreateTopicNames is set")
+	}
+}

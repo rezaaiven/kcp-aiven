@@ -1,6 +1,8 @@
 package hcl
 
 import (
+	"strconv"
+
 	"github.com/confluentinc/kcp/internal/services/hcl/aiven"
 	"github.com/confluentinc/kcp/internal/types"
 	"github.com/confluentinc/kcp/internal/utils"
@@ -39,6 +41,7 @@ func GetAivenMigrateTopicsVariableDefinitions() []types.TerraformVariable {
 		{Name: aiven.VarConfluentSourceAPIKey, Description: "Confluent API key (SASL username)", Sensitive: true, Type: "string"},
 		{Name: aiven.VarConfluentSourceAPISecret, Description: "Confluent API secret (SASL password)", Sensitive: true, Type: "string"},
 		{Name: aiven.VarTopics, Description: "Topic patterns to replicate (e.g. [\".*\"] for all)", Sensitive: false, Type: "list(string)"},
+		{Name: aiven.VarCreateTopicNames, Description: "Optional list of topic names to create on Aiven via aiven_kafka_topic", Sensitive: false, Type: "list(string)"},
 	}
 }
 
@@ -112,6 +115,16 @@ func (s *AivenMigrateTopicsHCLService) generateRootMainTf(request types.AivenMig
 			"aiven_service_integration." + aivenMigrateTopicsIntegrationKafka,
 		},
 	))
+
+	// 6. Optional: aiven_kafka_topic for each name in create_topic_names
+	for i, topicName := range request.CreateTopicNames {
+		if topicName == "" {
+			continue
+		}
+		tfResourceName := "topic_" + utils.FormatHclResourceName(topicName) + "_" + strconv.Itoa(i)
+		rootBody.AppendNewline()
+		rootBody.AppendBlock(aiven.GenerateKafkaTopic(tfResourceName, aiven.VarProjectName, aiven.VarAivenKafkaServiceName, topicName))
+	}
 
 	return string(f.Bytes())
 }
@@ -190,6 +203,18 @@ func (s *AivenMigrateTopicsHCLService) generateInputsAutoTfvars(request types.Ai
 	}
 	rootBody.SetAttributeValue("topics", cty.ListVal([]cty.Value{cty.StringVal(topicPattern)}))
 
+	if len(request.CreateTopicNames) > 0 {
+		createTopicVals := make([]cty.Value, 0, len(request.CreateTopicNames))
+		for _, t := range request.CreateTopicNames {
+			if t != "" {
+				createTopicVals = append(createTopicVals, cty.StringVal(t))
+			}
+		}
+		if len(createTopicVals) > 0 {
+			rootBody.SetAttributeValue("create_topic_names", cty.ListVal(createTopicVals))
+		}
+	}
+
 	return string(f.Bytes())
 }
 
@@ -222,5 +247,6 @@ func (s *AivenMigrateTopicsHCLService) generateReadmeMd() string {
 		"| external_endpoint_name | Name for external Kafka endpoint |\n" +
 		"| confluent_source_api_key | Confluent API key (sensitive) |\n" +
 		"| confluent_source_api_secret | Confluent API secret (sensitive) |\n" +
-		"| topics | List of topic patterns (e.g. [\".*\"]) |\n"
+		"| topics | List of topic patterns (e.g. [\".*\"]) |\n" +
+		"| create_topic_names | Optional list of topic names to create on Aiven (aiven_kafka_topic) |\n"
 }

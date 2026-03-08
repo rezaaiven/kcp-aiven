@@ -183,6 +183,11 @@ So: **MirrorMaker 2 is the replication path**; **external Kafka integration is h
 - **Schemas:** If state has schema registry info for Confluent, add step to export/import schemas to Aiven Schema Registry (Aiven has Schema Registry); can be a new `create-asset migrate-schemas --target aiven` or extend existing migrate-schemas.
 - **ACLs:** Map Confluent ACLs (or RBAC) to Aiven ACLs if Aiven supports them via API/Terraform; add `create-asset migrate-acls` path for Aiven target.
 
+- **Implemented (Phase 2.3):**
+  - **Topics:** `migrate-topics-aiven` accepts optional `--create-topics` (comma-separated topic names). When set, generated Terraform includes `aiven_kafka_topic` resources for each name (variable `create_topic_names`).
+  - **Schemas:** `kcp create-asset migrate-schemas-aiven` with `--confluent-sr-url`, `--aiven-project`, `--aiven-kafka-service-name`, optional `--subjects`, `--output-dir`. Generates `export_import_schemas.sh` and README; script uses Confluent SR and Aiven Karapace APIs with credentials via env vars (CONFLUENT_SR_*, AIVEN_SR_*).
+  - **ACLs:** `kcp create-asset migrate-acls-aiven` with `--acl-file` (JSON array or `{"acls": [...]}`), `--aiven-project`, `--aiven-kafka-service-name`, `--output-dir`. Generates Terraform `aiven_kafka_acl` for topic-level ACLs only; principal/topic/permission mapping and limitations documented in README.
+
 ---
 
 ## Phase 3: Reports and UI
