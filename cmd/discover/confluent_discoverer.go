@@ -9,10 +9,16 @@ import (
 	"github.com/confluentinc/kcp/internal/types"
 )
 
+// confluentLister is the subset of Confluent Cloud API used by discover. It allows tests to use a mock.
+type confluentLister interface {
+	ListEnvironments(ctx context.Context) ([]client.Environment, error)
+	ListClusters(ctx context.Context, environmentID string) ([]client.Cluster, error)
+}
+
 // RunDiscoverConfluent discovers Confluent Cloud environments and Kafka clusters using
-// the given client and writes state to stateFilePath. It does not modify the MSK State type.
-func RunDiscoverConfluent(ctx context.Context, cc *client.ConfluentCloudClient, stateFilePath string) error {
-	if cc == nil {
+// the given lister and writes state to stateFilePath. It does not modify the MSK State type.
+func RunDiscoverConfluent(ctx context.Context, lister confluentLister, stateFilePath string) error {
+	if lister == nil {
 		return fmt.Errorf("confluent cloud client is nil")
 	}
 	if stateFilePath == "" {
@@ -22,7 +28,7 @@ func RunDiscoverConfluent(ctx context.Context, cc *client.ConfluentCloudClient, 
 
 	state := types.NewConfluentMigrationState()
 
-	envs, err := cc.ListEnvironments(ctx)
+	envs, err := lister.ListEnvironments(ctx)
 	if err != nil {
 		return fmt.Errorf("list environments: %w", err)
 	}
@@ -36,7 +42,7 @@ func RunDiscoverConfluent(ctx context.Context, cc *client.ConfluentCloudClient, 
 			DisplayName: e.DisplayName,
 		})
 
-		clusters, err := cc.ListClusters(ctx, e.ID)
+		clusters, err := lister.ListClusters(ctx, e.ID)
 		if err != nil {
 			return fmt.Errorf("list clusters for environment %s: %w", e.ID, err)
 		}
