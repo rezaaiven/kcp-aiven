@@ -143,6 +143,12 @@ This keeps the existing MSK → Confluent flow untouched and makes the Confluent
 - **CLI:** Either:
   - New command: `kcp create-asset target-infra-aiven` (output dir, project name, cloud/region, Confluent bootstrap as “source”), or
   - Extend `create-asset target-infra` with `--target aiven` and a new request type (e.g. `AivenTargetRequest`) that drives Aiven HCL generation instead of Confluent.
+- **Implemented (Phase 2.1):** `kcp create-asset target-infra-aiven` with `--project`, `--cloud-name`, `--plan`, `--service-name`, `--output-dir`, `--prevent-destroy`. Aiven credentials via `AIVEN_TOKEN` / `AIVEN_API_TOKEN` or `aiven-credentials.yaml` (see `docs/aiven-credentials.example.yaml`). Generated Terraform uses Aiven provider and `aiven_kafka`; Kafka SASL credentials are obtained from Aiven after the service is created.
+
+- **Possible follow-ups (Phase 2.1, not done):**
+  - **Optional credentials check in PreRunE:** Call `GetAivenCredentials(DefaultAivenCredentialsFileName)` in the CLI and fail fast if neither env nor file is set. Deferred because it would break “generate-only” workflows (e.g. CI that only writes Terraform and runs apply elsewhere with AIVEN_TOKEN).
+  - **Stricter `cloud_name` format:** Validate pattern (e.g. `provider-region` like `aws-eu-west-1`). Aiven’s exact rules are not clearly documented; Terraform will fail on apply if invalid. Can be added later if we get official constraints.
+  - **Warn when output dir exists:** Emit a warning if `--output-dir` already exists and has content, to avoid overwriting. Current behavior matches existing `target-infra`; can be added for consistency.
 
 ### 2.2 Cluster linking / replication (Confluent → Aiven)
 

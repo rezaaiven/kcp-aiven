@@ -140,6 +140,17 @@ type TargetClusterWizardRequest struct {
 	SubnetCidrRanges []string `json:"subnet_cidr_ranges"`
 }
 
+// AivenTargetRequest holds parameters for generating Aiven for Kafka target infrastructure (Phase 2).
+// Used by create-asset target-infra-aiven. Kafka SASL credentials are obtained from Aiven
+// after the service is created and passed as Terraform variables at apply time (not stored here).
+type AivenTargetRequest struct {
+	ProjectName   string `json:"project_name"`   // Aiven project name
+	CloudName     string `json:"cloud_name"`     // e.g. "google-europe-west1", "aws-eu-west-1"
+	Plan          string `json:"plan"`            // e.g. "business-4", "startup-2"
+	ServiceName   string `json:"service_name"`   // Unique name for the Kafka service
+	PreventDestroy bool  `json:"prevent_destroy"` // Whether to set lifecycle { prevent_destroy = true }
+}
+
 type TerraformFiles struct {
 	MainTf           string `json:"main.tf"`
 	ProvidersTf      string `json:"providers.tf"`

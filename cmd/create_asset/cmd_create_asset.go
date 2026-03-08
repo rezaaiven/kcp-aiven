@@ -29,6 +29,7 @@ func NewCreateAssetCmd() *cobra.Command {
 		migration_infra.NewMigrationInfraCmd(),
 		reverse_proxy.NewReverseProxyCmd(),
 		targetinfra.NewTargetInfraCmd(),
+		targetinfra.NewTargetInfraAivenCmd(),
 	)
 
 	return createAssetCmd
