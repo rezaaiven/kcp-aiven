@@ -13,6 +13,7 @@
 
 # Ignore environment-specific files
 .envrc
+.tool-versions
 
 # Ignore CLI configuration files
 .terraformrc
